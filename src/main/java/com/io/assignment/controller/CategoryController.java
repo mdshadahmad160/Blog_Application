@@ -1,5 +1,6 @@
 package com.io.assignment.controller;
 
+import com.io.assignment.payload.response.BlogResponse;
 import com.io.assignment.payload.response.CategoryResponse;
 import com.io.assignment.payload.response.PageResponse;
 import com.io.assignment.service.BlogService;
@@ -39,5 +40,14 @@ public class CategoryController {
         return new ResponseEntity<>(categoryResponse, HttpStatus.OK);
     }
 
+    @GetMapping("/{category_id}/blogs")
+    public ResponseEntity<PageResponse<BlogResponse>> getBlogsByCategory(
+            @PathVariable("category_id") Long categoryId,
+            @RequestParam(value = "page", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER) Integer page,
+            @RequestParam(value = "size", defaultValue = AppConstant.DEFAULT_PAGE_SIZE) Integer size
+    ) {
+        PageResponse<BlogResponse> pageResponse = blogService.getBlogsByCategory(categoryId, page, size);
+        return new ResponseEntity<>(pageResponse, HttpStatus.OK);
+    }
 
 }
