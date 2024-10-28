@@ -1,8 +1,11 @@
 package com.io.assignment.controller;
 
+import com.io.assignment.payload.request.CategoryRequest;
 import com.io.assignment.payload.response.BlogResponse;
 import com.io.assignment.payload.response.CategoryResponse;
 import com.io.assignment.payload.response.PageResponse;
+import com.io.assignment.security.CurrentUser;
+import com.io.assignment.security.UserPrincipal;
 import com.io.assignment.service.BlogService;
 import com.io.assignment.service.CategoryService;
 import com.io.assignment.utils.AppConstant;
@@ -31,7 +34,7 @@ public class CategoryController {
     ) {
         PageResponse<CategoryResponse> categoryResponse = categoryService.getAllCategories(page, size);
 
-        return new ResponseEntity<>(categoryResponse, HttpStatus.CREATED);
+        return new ResponseEntity<>(categoryResponse, HttpStatus.OK);
     }
 
     @GetMapping("/{category_id}")
@@ -48,6 +51,12 @@ public class CategoryController {
     ) {
         PageResponse<BlogResponse> pageResponse = blogService.getBlogsByCategory(categoryId, page, size);
         return new ResponseEntity<>(pageResponse, HttpStatus.OK);
+    }
+    @PostMapping
+    public ResponseEntity<CategoryResponse> createCategory(@RequestBody CategoryRequest categoryRequest,
+                                                           @CurrentUser UserPrincipal userPrincipal){
+        CategoryResponse  categoryResponse=categoryService.createCategory(categoryRequest,userPrincipal);
+        return new ResponseEntity<>(categoryResponse,HttpStatus.CREATED);
     }
 
 }

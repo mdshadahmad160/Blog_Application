@@ -17,7 +17,7 @@ public class UserController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<UserProfileResponse> registerUserHansdler(@RequestBody UserRequest userRequest) {
+    public ResponseEntity<UserProfileResponse> registerUserHandler(@RequestBody UserRequest userRequest) {
         UserProfileResponse profileResponse = userService.createUser(userRequest);
         return new ResponseEntity<>(profileResponse, HttpStatus.CREATED);
     }
