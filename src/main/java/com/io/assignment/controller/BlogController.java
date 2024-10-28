@@ -2,6 +2,7 @@ package com.io.assignment.controller;
 
 import com.io.assignment.payload.request.BlogRequest;
 import com.io.assignment.payload.request.CommentRequest;
+import com.io.assignment.payload.response.ApiResponse;
 import com.io.assignment.payload.response.BlogResponse;
 import com.io.assignment.payload.response.CommentResponse;
 import com.io.assignment.payload.response.PageResponse;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * @author Shad Ahmad
- * @apiNote this could be the Blog Controller
+ * @apiNote this could be the Blog Controller but its depends on Tag and Comment Entity also
  */
 @RestController
 @RequestMapping("/api/v1/blogs")
@@ -67,6 +68,28 @@ public class BlogController {
         PageResponse<CommentResponse> pageResponse = commentService.getCommentByBlog(blogId, page, size);
 
         return new ResponseEntity<>(pageResponse, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{blog_id}")
+    public ResponseEntity<ApiResponse> deleteBlogById(@PathVariable("blog_id") Long blogId,
+                                                      @CurrentUser UserPrincipal userPrincipal) {
+        ApiResponse apiResponse = blogService.deleteBlogById(blogId, userPrincipal);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{blog_id}/comments")
+    public ResponseEntity<ApiResponse> deleteCommentsByBlog(@PathVariable("blog_id") Long blogId,
+                                                            @CurrentUser UserPrincipal userPrincipal) {
+        ApiResponse apiResponse = commentService.deleteCommentsByBlog(blogId, userPrincipal);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+    }
+
+    @PutMapping("/{blog_id}")
+    public ResponseEntity<BlogResponse> updateBlogById(@PathVariable("blog_id") Long blogId,
+                                                       @RequestBody BlogRequest blogRequest,
+                                                       @CurrentUser UserPrincipal userPrincipal) {
+        BlogResponse blogResponse = blogService.updateBlogById(blogId, blogRequest, userPrincipal);
+        return new ResponseEntity<>(blogResponse, HttpStatus.OK);
     }
 
 
