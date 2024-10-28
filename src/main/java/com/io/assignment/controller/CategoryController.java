@@ -1,6 +1,7 @@
 package com.io.assignment.controller;
 
 import com.io.assignment.payload.request.CategoryRequest;
+import com.io.assignment.payload.response.ApiResponse;
 import com.io.assignment.payload.response.BlogResponse;
 import com.io.assignment.payload.response.CategoryResponse;
 import com.io.assignment.payload.response.PageResponse;
@@ -52,11 +53,42 @@ public class CategoryController {
         PageResponse<BlogResponse> pageResponse = blogService.getBlogsByCategory(categoryId, page, size);
         return new ResponseEntity<>(pageResponse, HttpStatus.OK);
     }
+
     @PostMapping
     public ResponseEntity<CategoryResponse> createCategory(@RequestBody CategoryRequest categoryRequest,
-                                                           @CurrentUser UserPrincipal userPrincipal){
-        CategoryResponse  categoryResponse=categoryService.createCategory(categoryRequest,userPrincipal);
-        return new ResponseEntity<>(categoryResponse,HttpStatus.CREATED);
+                                                           @CurrentUser UserPrincipal userPrincipal) {
+        CategoryResponse categoryResponse = categoryService.createCategory(categoryRequest, userPrincipal);
+        return new ResponseEntity<>(categoryResponse, HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/{category_id}")
+    public ResponseEntity<ApiResponse> deleteCategoryById(@PathVariable("category_id") Long categoryId,
+                                                          @CurrentUser UserPrincipal userPrincipal) {
+        ApiResponse apiResponse = categoryService.deleteCategoryById(categoryId, userPrincipal);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<ApiResponse> deleteAll() {
+        ApiResponse apiResponse = categoryService.deleteAll();
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+    }
+
+
+    @DeleteMapping("/{category_id}/blogs")
+    public ResponseEntity<ApiResponse> deleteBlogsByCategory(@PathVariable("category_id") Long categoryId,
+                                                             @CurrentUser UserPrincipal userPrincipal) {
+        ApiResponse apiResponse = blogService.deleteBlogsByCategory(categoryId, userPrincipal);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+    }
+
+
+    @PutMapping("/{category_id}")
+    public ResponseEntity<CategoryResponse> updateCategoryById(@PathVariable("category_id") Long categoryId,
+                                                               @RequestBody CategoryRequest categoryRequest,
+                                                               @CurrentUser UserPrincipal userPrincipal) {
+        CategoryResponse categoryResponse = categoryService.updateCategoryById(categoryId, categoryRequest, userPrincipal);
+        return new ResponseEntity<>(categoryResponse, HttpStatus.OK);
     }
 
 }
