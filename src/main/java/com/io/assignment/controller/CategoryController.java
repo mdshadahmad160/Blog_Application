@@ -1,10 +1,7 @@
 package com.io.assignment.controller;
 
 import com.io.assignment.payload.request.CategoryRequest;
-import com.io.assignment.payload.response.ApiResponse;
-import com.io.assignment.payload.response.BlogResponse;
-import com.io.assignment.payload.response.CategoryResponse;
-import com.io.assignment.payload.response.PageResponse;
+import com.io.assignment.payload.response.*;
 import com.io.assignment.security.CurrentUser;
 import com.io.assignment.security.UserPrincipal;
 import com.io.assignment.service.BlogService;
@@ -90,5 +87,7 @@ public class CategoryController {
         CategoryResponse categoryResponse = categoryService.updateCategoryById(categoryId, categoryRequest, userPrincipal);
         return new ResponseEntity<>(categoryResponse, HttpStatus.OK);
     }
+
+
 
 }
