@@ -2,6 +2,8 @@ package com.io.assignment.service.impl;
 
 import com.io.assignment.entity.Blog;
 import com.io.assignment.entity.Tag;
+import com.io.assignment.entity.User;
+import com.io.assignment.enums.RoleName;
 import com.io.assignment.exception.ResourceExistException;
 import com.io.assignment.exception.ResourceNotFoundException;
 import com.io.assignment.payload.request.TagRequest;
@@ -20,6 +22,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -84,27 +88,60 @@ public class TagServiceImpl implements TagService {
         pageResponse.setTotalElements(tags.getNumberOfElements());
         pageResponse.setTotalPages(tags.getTotalPages());
         pageResponse.setLast(tags.isLast());
-        
+
         return pageResponse;
     }
 
     @Override
     public PageResponse<TagResponse> getAllTags(Integer page, Integer size) {
-        return null;
+        AppUtils.validatePageAndSize(page, size);
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Tag> tags = tagRepository.findAll(pageable);
+        List<TagResponse> tagResponses = Arrays.asList(
+                modelMapper.map(tags.get(), TagResponse[].class)
+        );
+
+        PageResponse<TagResponse> pageResponse = new PageResponse<>();
+        pageResponse.setContent(tagResponses);
+        pageResponse.setSize(size);
+        pageResponse.setPage(page);
+        pageResponse.setTotalElements(tags.getNumberOfElements());
+        pageResponse.setTotalPages(tags.getTotalPages());
+        pageResponse.setLast(tags.isLast());
+        return pageResponse;
     }
 
     @Override
     public ApiResponse deleteTagById(Long tagId) {
-        return null;
+        Tag tag = tagRepository.findById(tagId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException(AppConstant.TAG_NOT_FOUND + tagId)
+                );
+        tagRepository.delete(tag);
+        return new ApiResponse(Boolean.TRUE, AppConstant.TAG_DELETE_MESSAGE, HttpStatus.OK);
     }
 
     @Override
     public ApiResponse deleteAllTag() {
-        return null;
+        tagRepository.findAll();
+        return new ApiResponse(Boolean.TRUE, AppConstant.TAG_DELETE_MESSAGE, HttpStatus.OK);
     }
 
     @Override
     public ApiResponse removeTagsByBlog(Long blogId, UserPrincipal userPrincipal) {
+        Blog blog=blogRepository.findById(blogId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException(AppConstant.BLOG_NOT_FOUND + blogId)
+                );
+        User user=userRepository.findByBlogs(blog);
+        if (user.getId().equals(userPrincipal.getId()) || userPrincipal.getAuthorities()
+                .contains(new SimpleGrantedAuthority("ROLE_"+ RoleName.ADMIN))){
+            List<Tag> tags=tagRepository.findAllByBlogs(blog);
+
+            for (Tag tag: tags){
+                
+            }
+        }
         return null;
     }
 
