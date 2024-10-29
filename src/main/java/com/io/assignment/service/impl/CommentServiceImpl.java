@@ -29,6 +29,10 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * @author Shad Ahmad
+ */
+
 @Service
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
