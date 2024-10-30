@@ -4,6 +4,7 @@ import com.io.assignment.entity.Blog;
 import com.io.assignment.entity.Tag;
 import com.io.assignment.entity.User;
 import com.io.assignment.enums.RoleName;
+import com.io.assignment.exception.AccessDeniedException;
 import com.io.assignment.exception.ResourceExistException;
 import com.io.assignment.exception.ResourceNotFoundException;
 import com.io.assignment.payload.request.TagRequest;
@@ -129,24 +130,33 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public ApiResponse removeTagsByBlog(Long blogId, UserPrincipal userPrincipal) {
-        Blog blog=blogRepository.findById(blogId)
+        Blog blog = blogRepository.findById(blogId)
                 .orElseThrow(
                         () -> new ResourceNotFoundException(AppConstant.BLOG_NOT_FOUND + blogId)
                 );
-        User user=userRepository.findByBlogs(blog);
+        User user = userRepository.findByBlogs(blog);
         if (user.getId().equals(userPrincipal.getId()) || userPrincipal.getAuthorities()
-                .contains(new SimpleGrantedAuthority("ROLE_"+ RoleName.ADMIN))){
-            List<Tag> tags=tagRepository.findAllByBlogs(blog);
+                .contains(new SimpleGrantedAuthority("ROLE_" + RoleName.ADMIN))) {
+            List<Tag> tags = tagRepository.findAllByBlogs(blog);
 
-            for (Tag tag: tags){
-                
+            for (Tag tag : tags) {
+                tag.removeBlog(blog);
+
             }
+            tagRepository.saveAll(tags);
+            return new ApiResponse(Boolean.TRUE, AppConstant.TAG_DELETE_MESSAGE, HttpStatus.OK);
         }
-        return null;
+        throw new AccessDeniedException(AppConstant.TAG_REMOVE_DENY);
     }
 
     @Override
     public TagResponse updateTagById(Long tagId, TagRequest tagRequest) {
-        return null;
+        Tag tag = tagRepository.findById(tagId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException(AppConstant.TAG_NOT_FOUND + tagId)
+                );
+        modelMapper.map(tagRequest, tag);
+        tagRepository.save(tag);
+        return modelMapper.map(tag, TagResponse.class);
     }
 }
